@@ -1,0 +1,38 @@
+name: release
+
+# Тег v* (например v0.1.0) собирает мод и выкладывает релиз: jar и companion.json.
+# Phase берёт companion.json из «latest release» и ставит мод у хоста одной кнопкой.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install blake3
+      - name: Test and build
+        run: ./gradlew test :fabric:build
+      - name: Collect jars
+        run: |
+          mkdir dist
+          mc=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2)
+          ver=$(grep '^mod_version=' gradle.properties | cut -d= -f2)
+          cp fabric/build/libs/phase-companion-${ver}+fabric.${mc}.jar "dist/phase-companion-fabric-${mc}-${ver}.jar"
+      - name: Manifest
+        run: python tools/make_manifest.py "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" dist
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --title "Phase Companion $GITHUB_REF_NAME" --generate-notes
