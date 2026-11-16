@@ -23,7 +23,9 @@ jobs:
           python-version: "3.12"
       - run: pip install blake3
       - name: Test and build
-        run: ./gradlew test :fabric:build
+        run: |
+          chmod +x gradlew
+          ./gradlew test :fabric:build
       - name: Collect jars
         run: |
           mkdir dist
