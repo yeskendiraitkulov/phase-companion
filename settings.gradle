@@ -1,0 +1,16 @@
+pluginManagement {
+	repositories {
+		maven {
+			name = 'Fabric'
+			url = 'https://maven.fabricmc.net/'
+		}
+		mavenCentral()
+		gradlePluginPortal()
+	}
+}
+
+rootProject.name = 'phase-companion'
+
+// core — чистая Java без Minecraft: формат room.json, проверка, план применения.
+// fabric — тонкий адаптер под Fabric (пока одна версия игры, см. PLAN.md §1).
+include 'core', 'fabric'

@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "app.phase.companion.fabric.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"mixins": [
+		"MinecraftServerMixin"
+	],
+	"client": [
+		"IntegratedServerMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

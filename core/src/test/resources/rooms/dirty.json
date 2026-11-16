@@ -1,0 +1,18 @@
+{
+  "active": true,
+  "code": null,
+  "max_players": 8,
+  "players": [
+    {
+      "color": "coral_flame",
+      "glow": false,
+      "label": null,
+      "name": "Steve",
+      "name_color": "red",
+      "prefix_color": "#FB7185",
+      "rank": "host"
+    }
+  ],
+  "schema": 1,
+  "title": "PHASE"
+}

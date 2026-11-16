@@ -1,0 +1,40 @@
+plugins {
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+}
+
+group = project.maven_group
+version = "${project.mod_version}+fabric.${project.minecraft_version}"
+base {
+	archivesName = 'phase-companion'
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	// Fabric API не нужен: мод держится на загрузчике и двух миксинах, поэтому новую
+	// версию игры можно поддержать в день релиза, не дожидаясь Fabric API.
+	implementation project(':core')
+}
+
+processResources {
+	def version = project.version
+	def mc = project.minecraft_version
+	inputs.property 'version', version
+	inputs.property 'mc', mc
+	filesMatching('fabric.mod.json') {
+		expand 'version': version, 'mc': mc
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 25
+	it.options.encoding = 'UTF-8'
+}
+
+jar {
+	// core — часть мода: классы кладутся в тот же jar.
+	from(project(':core').sourceSets.main.output)
+	from(rootProject.file('LICENSE')) {
+		rename { 'LICENSE_phase_companion' }
+	}
+}

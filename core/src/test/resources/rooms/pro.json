@@ -1,0 +1,45 @@
+{
+  "active": true,
+  "code": "SAIT",
+  "max_players": 20,
+  "players": [
+    {
+      "color": "ice_sapphire",
+      "glow": true,
+      "label": "HOST",
+      "name": "Sait",
+      "name_color": "blue",
+      "prefix_color": "#38BDF8",
+      "rank": "host"
+    },
+    {
+      "color": "amber_gold",
+      "glow": false,
+      "label": "VIP",
+      "name": "Kira",
+      "name_color": "gold",
+      "prefix_color": "#FBBF24",
+      "rank": "pro"
+    },
+    {
+      "color": "cyber_cyan",
+      "glow": false,
+      "label": "Строй",
+      "name": "Den4ik",
+      "name_color": "aqua",
+      "prefix_color": "#22D3EE",
+      "rank": "guest"
+    },
+    {
+      "color": null,
+      "glow": false,
+      "label": null,
+      "name": "Guest_7",
+      "name_color": null,
+      "prefix_color": "#38BDF8",
+      "rank": "guest"
+    }
+  ],
+  "schema": 1,
+  "title": "Остров Саита"
+}
