@@ -2,6 +2,7 @@
   "account_check": true,
   "active": true,
   "code": null,
+  "footer": true,
   "max_players": 8,
   "players": [
     {

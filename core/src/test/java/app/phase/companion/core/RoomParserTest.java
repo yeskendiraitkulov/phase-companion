@@ -59,6 +59,7 @@ class RoomParserTest {
 	void proRoom() throws Exception {
 		Room room = RoomParser.parse(fixture("pro.json"));
 		assertEquals("Остров Саита", room.title());
+		assertFalse(room.footer(), "Pro-хост убрал подвал");
 		assertEquals(20, RoomPlan.maxPlayers(8, room));
 		List<RoomPlan.TeamSpec> teams = RoomPlan.teams(room);
 		assertEquals(List.of("ph.a00", "ph.b01", "ph.c02"), teams.stream().map(RoomPlan.TeamSpec::team).toList());

@@ -2,6 +2,7 @@
   "account_check": false,
   "active": true,
   "code": "SAIT",
+  "footer": false,
   "max_players": 20,
   "players": [
     {

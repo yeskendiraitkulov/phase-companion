@@ -2,6 +2,7 @@
   "account_check": true,
   "active": true,
   "code": "K7F-2QX",
+  "footer": true,
   "max_players": 5,
   "players": [
     {
