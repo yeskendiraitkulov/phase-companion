@@ -49,6 +49,8 @@ public final class Companion {
 	private final Path phaseDir;
 	private final RoomWatcher watcher;
 	private final int vanillaMax;
+	/** Проверка аккаунта, как её настроила игра: её мод и возвращает. */
+	private final boolean vanillaAuth;
 
 	private Room room = Room.CLOSED;
 	/** Файл в незнакомом формате: мод молчит, оформление делает датапак. */
@@ -65,6 +67,7 @@ public final class Companion {
 		this.watcher = new RoomWatcher(phaseDir.resolve("room.json"));
 		((PhaseServer) server).phase$setPlayerLimit(PhaseServer.VANILLA);
 		this.vanillaMax = server.getMaxPlayers();
+		this.vanillaAuth = server.usesAuthentication();
 	}
 
 	/** Только встроенный сервер одиночной игры: свой сервер настраивается сам. */
@@ -100,6 +103,7 @@ public final class Companion {
 		}
 		if (!standingDown) {
 			pulse();
+			applyAccess();
 			if (room.active()) {
 				syncGlow();
 			}
@@ -107,6 +111,7 @@ public final class Companion {
 	}
 
 	public void stop() {
+		restoreAccess();
 		// Команды остаются в сохранении, как у датапака: при следующем открытии мира Phase
 		// или мод приведут их к текущей комнате, закрытая комната их уберёт.
 		glowing.clear();
@@ -116,6 +121,7 @@ public final class Companion {
 
 	private void apply(Room next) {
 		room = next;
+		applyAccess();
 		applyTeams();
 		((PhaseServer) server).phase$setPlayerLimit(RoomPlan.maxPlayers(vanillaMax, room));
 		// Шапку теперь даёт настоящий Tab: bossbar датапака не нужен.
@@ -205,6 +211,34 @@ public final class Companion {
 		standingDown = true;
 		room = Room.CLOSED;
 		((PhaseServer) server).phase$setPlayerLimit(PhaseServer.VANILLA);
+		restoreAccess();
+	}
+
+	/**
+	 * Вход без проверки аккаунта — по настройке хоста в Phase. Проверяется раз в секунду:
+	 * если игра сама вернула проверку (например, при открытии для сети), мод снимает её
+	 * снова, пока настройка не изменится.
+	 */
+	private void applyAccess() {
+		if (room.accountCheck()) {
+			restoreAccess();
+			return;
+		}
+		((PhaseServer) server).phase$setGuardNames(true);
+		if (server.usesAuthentication()) {
+			server.setUsesAuthentication(false);
+			LOG.info("Phase Companion: игроков пускают без проверки аккаунта (настройка хоста в Phase)");
+		}
+	}
+
+	private void restoreAccess() {
+		PhaseServer phase = (PhaseServer) server;
+		if (!phase.phase$guardNames()) {
+			return;
+		}
+		phase.phase$setGuardNames(false);
+		server.setUsesAuthentication(vanillaAuth);
+		LOG.info("Phase Companion: проверка аккаунта при входе снова как в игре");
 	}
 
 	/**

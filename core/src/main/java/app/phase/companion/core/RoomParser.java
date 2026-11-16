@@ -62,8 +62,10 @@ public final class RoomParser {
 		if (schema != SCHEMA) {
 			throw new UnsupportedRoomException("неизвестная версия формата: " + schema);
 		}
+		// Нет поля — проверка как в игре: так безопаснее для старых файлов.
+		boolean accountCheck = boolOr(root, "account_check", true);
 		if (!boolOr(root, "active", false)) {
-			return Room.CLOSED;
+			return accountCheck ? Room.CLOSED : Room.PLAIN_OPEN;
 		}
 		String title = title(stringOr(root, "title", null));
 		String code = stringOr(root, "code", null);
@@ -72,7 +74,7 @@ public final class RoomParser {
 		}
 		int maxPlayers = Math.max(1, Math.min(intOr(root, "max_players", 1), 100));
 		boolean footer = boolOr(root, "footer", true);
-		return new Room(true, title, code, maxPlayers, footer, players(root));
+		return new Room(true, accountCheck, title, code, maxPlayers, footer, players(root));
 	}
 
 	private static List<RoomPlayer> players(JsonObject root) {

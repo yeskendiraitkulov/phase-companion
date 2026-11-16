@@ -118,6 +118,23 @@ class RoomParserTest {
 	}
 
 	@Test
+	void accountCheckFlag() throws Exception {
+		assertTrue(RoomParser.parse(fixture("free.json")).accountCheck());
+		Room pro = RoomParser.parse(fixture("pro.json"));
+		assertFalse(pro.accountCheck());
+		assertTrue(pro.active());
+		// Оформление выключено, а вход без проверки — включён.
+		Room plain = RoomParser.parse(fixture("plain_open.json"));
+		assertFalse(plain.active());
+		assertFalse(plain.accountCheck());
+		assertTrue(RoomPlan.teams(plain).isEmpty());
+		assertEquals(8, RoomPlan.maxPlayers(8, plain));
+		// Нет поля или не логическое значение — проверка как в игре.
+		assertTrue(RoomParser.parse("{\"schema\":1,\"active\":false}").accountCheck());
+		assertTrue(RoomParser.parse("{\"schema\":1,\"active\":true,\"account_check\":\"no\"}").accountCheck());
+	}
+
+	@Test
 	void unknownSchemaOrJunkIsUnsupported() {
 		assertThrows(RoomParser.UnsupportedRoomException.class,
 				() -> RoomParser.parse("{\"schema\": 2, \"active\": true}"));

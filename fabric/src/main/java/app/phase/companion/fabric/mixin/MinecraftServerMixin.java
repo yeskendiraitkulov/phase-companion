@@ -27,6 +27,19 @@ public abstract class MinecraftServerMixin implements PhaseServer {
 	public void phase$setPlayerLimit(int limit) {
 		phase$limit = limit;
 	}
+
+	@Unique
+	private boolean phase$guard;
+
+	@Override
+	public boolean phase$guardNames() {
+		return phase$guard;
+	}
+
+	@Override
+	public void phase$setGuardNames(boolean guard) {
+		phase$guard = guard;
+	}
 	@Unique
 	private boolean phase$started;
 
