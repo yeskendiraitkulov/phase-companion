@@ -1,4 +1,5 @@
 {
+  "account_check": false,
   "active": true,
   "code": "SAIT",
   "max_players": 20,
