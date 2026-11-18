@@ -3,6 +3,7 @@
   "active": true,
   "code": "SAIT",
   "footer": false,
+  "lang": "ru",
   "max_players": 50,
   "players": [
     {
