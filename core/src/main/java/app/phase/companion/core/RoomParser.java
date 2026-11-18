@@ -20,8 +20,8 @@ public final class RoomParser {
 
 	/** Версия формата, которую понимает мод. Другая — мод молчит, работает датапак. */
 	public static final int SCHEMA = 1;
-	/** Больше игроков встроенный сервер с модом не принимает. */
-	public static final int MAX_PLAYERS_CAP = 20;
+	/** Больше игроков мод не открывает: встроенный сервер работает на ПК хоста в одном потоке. Тот же предел у Phase ({@code look::MAX_SLOTS}). */
+	public static final int MAX_PLAYERS_CAP = 50;
 
 	static final int TITLE_MAX_CHARS = 32;
 	static final int PREFIX_MAX_CHARS = 8;

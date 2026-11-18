@@ -25,13 +25,20 @@ jobs:
       - name: Test and build
         run: |
           chmod +x gradlew
-          ./gradlew test :fabric:build
+          ./gradlew build
       - name: Collect jars
+        # Каждый адаптер <загрузчик>/<версия игры> (fabric, forge, neoforge) сам называет jar
+        # как в релизе: phase-companion-<загрузчик>-<версия игры>-<версия мода>.jar.
+        # Gradle идёт на Java 25: на ней же ForgeGradle запускает свои инструменты; jar для
+        # 1.21.1 собираются под Java 21 (options.release), недостающую Java Gradle скачает сам.
         run: |
           mkdir dist
-          mc=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2)
-          ver=$(grep '^mod_version=' gradle.properties | cut -d= -f2)
-          cp fabric/build/libs/phase-companion-${ver}+fabric.${mc}.jar "dist/phase-companion-fabric-${mc}-${ver}.jar"
+          for loader in fabric forge neoforge; do
+            cp $loader/*/build/libs/phase-companion-$loader-*.jar dist/
+          done
+          ls -l dist
+          # Сколько адаптеров, столько и jar: ни один загрузчик не выпал из релиза молча.
+          test "$(ls dist/*.jar | wc -l)" -eq "$(ls -d {fabric,forge,neoforge}/*/build.gradle | wc -l)"
       - name: Manifest
         run: python tools/make_manifest.py "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" dist
       - name: Publish release

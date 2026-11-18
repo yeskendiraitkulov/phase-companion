@@ -1,0 +1,52 @@
+// Общая часть сборки всех адаптеров: <загрузчик>/<версия игры>/build.gradle подключает
+// её после плагина своего загрузчика. Версия игры и Java — в gradle.properties папки версии.
+//
+// Исходники мода собираются из трёх мест (см. PLAN.md §5):
+//   common/src                 — игровой код, общий для всех загрузчиков и версий (Companion);
+//   common/<версия игры>/src   — то, что у версии игры своё, но одинаково у всех загрузчиков
+//                                (миксины на классы игры, TeamColors);
+//   <загрузчик>/...            — точка входа, метаданные и список миксинов загрузчика.
+
+// Имя загрузчика — имя родительской папки: fabric, forge, neoforge.
+def loaderName = project.parent.name
+ext.loaderName = loaderName
+
+group = project.maven_group
+version = project.mod_version
+base {
+	// Имя файла сразу как в релизе: phase-companion-<загрузчик>-<версия игры>-<версия мода>.jar.
+	archivesName = "phase-companion-${loaderName}-${project.minecraft_version}"
+}
+
+def shared = rootProject.file('common')
+sourceSets.main.java {
+	srcDir(new File(shared, 'src/main/java'))
+	srcDir(new File(shared, "${project.minecraft_version}/src/main/java"))
+}
+
+dependencies {
+	implementation project(':core')
+	testImplementation platform("org.junit:junit-bom:${project.junit_version}")
+	testImplementation 'org.junit.jupiter:junit-jupiter'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+	useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = project.java_version as int
+	it.options.encoding = 'UTF-8'
+}
+
+jar {
+	// core — часть мода: классы кладутся в тот же jar.
+	from(project(':core').sourceSets.main.output)
+	from(rootProject.file('LICENSE')) {
+		rename { 'LICENSE_phase_companion' }
+	}
+	manifest {
+		attributes 'Implementation-Version': project.mod_version
+	}
+}

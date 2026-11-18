@@ -1,0 +1,11 @@
+plugins {
+	// 26.x выходит без обфускации: Loom без переназначения имён и без маппингов.
+	id 'net.fabricmc.fabric-loom'
+}
+
+apply from: rootProject.file('fabric/fabric.gradle')
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+}

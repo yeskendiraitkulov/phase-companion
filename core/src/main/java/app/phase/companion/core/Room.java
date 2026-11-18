@@ -8,11 +8,11 @@ import java.util.List;
  * @param active     оформление включено; {@code false} — убрать из мира всё своё
  * @param accountCheck проверять аккаунт игроков при входе (как в игре); {@code false} —
  *                   пускать без проверки. Не зависит от {@code active}
- * @param title      заголовок шапки ({@code PHASE} или свой у Phase Pro)
+ * @param title      заголовок шапки ({@code PHASE} или свой заголовок хоста)
  * @param code       код комнаты или {@code null}
  * @param maxPlayers мест в комнате вместе с хостом
- * @param footer     показывать подвал «Работает на Phase» (Pro может выключить)
- * @param players    игроки в порядке {@code Tab}: хост, Pro, гости, внутри — по нику
+ * @param footer     показывать подвал «Работает на Phase» (хост может выключить)
+ * @param players    игроки в порядке {@code Tab}: хост, {@code pro} (старый формат), гости, внутри — по нику
  */
 public record Room(
 		boolean active,

@@ -1,0 +1,29 @@
+{
+  "account_check": true,
+  "active": true,
+  "code": "K7F-2QX",
+  "footer": true,
+  "max_players": 8,
+  "players": [
+    {
+      "color": null,
+      "glow": false,
+      "label": "HOST",
+      "name": "Steve",
+      "name_color": null,
+      "prefix_color": "#38BDF8",
+      "rank": "host"
+    },
+    {
+      "color": null,
+      "glow": false,
+      "label": null,
+      "name": "Alex_01",
+      "name_color": null,
+      "prefix_color": "#38BDF8",
+      "rank": "guest"
+    }
+  ],
+  "schema": 1,
+  "title": "PHASE"
+}

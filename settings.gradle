@@ -9,8 +9,21 @@ pluginManagement {
 	}
 }
 
+plugins {
+	// ForgeGradle запускает свои инструменты (Mavenizer) на конкретной Java (сейчас 25), а
+	// не на той, что у Gradle: недостающую Java Gradle скачает сам (Adoptium через foojay),
+	// как в MDK Forge и NeoForge.
+	id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
 rootProject.name = 'phase-companion'
 
 // core — чистая Java без Minecraft: формат room.json, проверка, план применения.
-// fabric — тонкий адаптер под Fabric (пока одна версия игры, см. PLAN.md §1).
-include 'core', 'fabric'
+// common — игровой код, общий для загрузчиков: common/src для всех версий игры,
+// common/<версия игры> — что у версии своё (миксины, TeamColors).
+// <загрузчик>/<версия игры> — тонкие адаптеры: точка входа, метаданные, список миксинов
+// (см. PLAN.md §5).
+include 'core',
+		'fabric:26.3', 'fabric:1.21.1',
+		'forge:1.21.1',
+		'neoforge:1.21.1'

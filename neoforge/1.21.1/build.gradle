@@ -1,0 +1,37 @@
+plugins {
+	id 'java'
+	// ModDevGradle: с 1.20.5 NeoForge работает в именах Mojang — без переназначения и refmap.
+	id 'net.neoforged.moddev' version "${moddev_version}"
+}
+
+apply from: rootProject.file('loader.gradle')
+
+neoForge {
+	version = project.neoforge_version
+}
+
+repositories {
+	mavenCentral()
+}
+
+// Проверка миксинов по классам игры (common/src/test): общая для Forge и NeoForge.
+sourceSets.test.java.srcDir(rootProject.file('common/src/test/java'))
+dependencies {
+	testImplementation "org.ow2.asm:asm-tree:${project.asm_version}"
+	testImplementation "com.google.code.gson:gson:${project.gson_version}"
+}
+// ModDevGradle кладёт игру в тесты только вместе с запуском игры (unitTest); тесту хватает
+// байт-кода классов игры — тех же, с которыми собран мод.
+sourceSets.test.runtimeClasspath += sourceSets.main.compileClasspath
+
+processResources {
+	def props = [
+		version: "${project.mod_version}+neoforge.${project.minecraft_version}",
+		neoforge: project.neoforge_range,
+		mc: project.minecraft_range,
+	]
+	inputs.properties props
+	filesMatching('META-INF/neoforge.mods.toml') {
+		expand props
+	}
+}

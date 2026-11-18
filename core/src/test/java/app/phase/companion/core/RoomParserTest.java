@@ -32,12 +32,12 @@ class RoomParserTest {
 	}
 
 	@Test
-	void freeRoom() throws Exception {
-		Room room = RoomParser.parse(fixture("free.json"));
+	void basicRoom() throws Exception {
+		Room room = RoomParser.parse(fixture("basic.json"));
 		assertTrue(room.active());
 		assertEquals("PHASE", room.title());
 		assertEquals("K7F-2QX", room.code());
-		assertEquals(5, room.maxPlayers());
+		assertEquals(8, room.maxPlayers());
 		assertTrue(room.footer(), "подвал по умолчанию включён");
 		assertEquals(2, room.players().size());
 		RoomPlayer host = room.players().get(0);
@@ -51,23 +51,25 @@ class RoomParserTest {
 
 		// Как у датапака: команда только хосту, гостю без стиля — нет.
 		assertEquals(List.of(new RoomPlan.TeamSpec("ph.a00", "Steve", host)), RoomPlan.teams(room));
-		assertEquals(8, RoomPlan.maxPlayers(8, room), "Free не опускает ванильный лимит");
+		assertEquals(8, RoomPlan.maxPlayers(8, room), "ванильный лимит не опускается");
 		assertEquals(" • K7F-2QX • ", RoomPlan.headerMiddle(room));
 	}
 
 	@Test
-	void proRoom() throws Exception {
-		Room room = RoomParser.parse(fixture("pro.json"));
+	void styledRoom() throws Exception {
+		Room room = RoomParser.parse(fixture("styled.json"));
 		assertEquals("Остров Саита", room.title());
-		assertFalse(room.footer(), "Pro-хост убрал подвал");
-		assertEquals(20, RoomPlan.maxPlayers(8, room));
+		assertFalse(room.footer(), "хост убрал подвал");
+		assertEquals(50, room.maxPlayers());
+		assertEquals(50, RoomPlan.maxPlayers(8, room), "до 50 мест с модом");
 		List<RoomPlan.TeamSpec> teams = RoomPlan.teams(room);
-		assertEquals(List.of("ph.a00", "ph.b01", "ph.c02"), teams.stream().map(RoomPlan.TeamSpec::team).toList());
-		assertEquals(List.of("Sait", "Kira", "Den4ik"), teams.stream().map(RoomPlan.TeamSpec::player).toList());
-		RoomPlayer kira = teams.get(1).style();
+		// Хост первым, гости по нику; гость без стиля команды не получает.
+		assertEquals(List.of("ph.a00", "ph.c01", "ph.c02"), teams.stream().map(RoomPlan.TeamSpec::team).toList());
+		assertEquals(List.of("Sait", "Den4ik", "Kira"), teams.stream().map(RoomPlan.TeamSpec::player).toList());
+		RoomPlayer kira = teams.get(2).style();
 		assertEquals("gold", kira.nameColor());
 		assertEquals(0xFBBF24, kira.prefixColor());
-		assertEquals("[Строй] ", teams.get(2).style().prefixText());
+		assertEquals("[Строй] ", teams.get(1).style().prefixText());
 		assertTrue(RoomPlan.glows(room, "sait"));
 		assertFalse(RoomPlan.glows(room, "Kira"));
 	}
@@ -107,7 +109,8 @@ class RoomParserTest {
 				""");
 		assertEquals("PHASE", room.title());
 		assertNull(room.code());
-		assertEquals(20, RoomPlan.maxPlayers(8, room), "не больше 20");
+		assertEquals(100, room.maxPlayers(), "парсер держит до 100");
+		assertEquals(50, RoomPlan.maxPlayers(8, room), "не больше 50");
 		assertEquals(List.of("Bob", "Amy", "Zed"), room.players().stream().map(RoomPlayer::name).toList());
 		RoomPlayer zed = room.players().get(2);
 		assertNull(zed.label());
@@ -118,12 +121,25 @@ class RoomParserTest {
 		assertEquals("OK", room.players().get(0).label());
 	}
 
+	/** Места: не меньше ванильных 8 (размер комнаты держит Phase) и не больше 50. */
+	@Test
+	void playerLimitIsClampedBetweenVanillaAndFifty() throws Exception {
+		int[][] cases = { { 1, 8 }, { 5, 8 }, { 8, 8 }, { 9, 9 }, { 20, 20 }, { 35, 35 }, { 50, 50 }, { 51, 50 }, { 100, 50 } };
+		for (int[] c : cases) {
+			Room room = RoomParser.parse("{\"schema\":1,\"active\":true,\"max_players\":" + c[0] + "}");
+			assertEquals(c[1], RoomPlan.maxPlayers(8, room), "max_players " + c[0]);
+		}
+		assertEquals(50, RoomParser.MAX_PLAYERS_CAP);
+		// Комната закрыта — лимит игры как был.
+		assertEquals(8, RoomPlan.maxPlayers(8, RoomParser.parse("{\"schema\":1,\"active\":false,\"max_players\":40}")));
+	}
+
 	@Test
 	void accountCheckFlag() throws Exception {
-		assertTrue(RoomParser.parse(fixture("free.json")).accountCheck());
-		Room pro = RoomParser.parse(fixture("pro.json"));
-		assertFalse(pro.accountCheck());
-		assertTrue(pro.active());
+		assertTrue(RoomParser.parse(fixture("basic.json")).accountCheck());
+		Room styled = RoomParser.parse(fixture("styled.json"));
+		assertFalse(styled.accountCheck());
+		assertTrue(styled.active());
 		// Оформление выключено, а вход без проверки — включён.
 		Room plain = RoomParser.parse(fixture("plain_open.json"));
 		assertFalse(plain.active());
@@ -159,7 +175,7 @@ class RoomParserTest {
 		assertEquals(new RoomWatcher.Changed(Room.CLOSED), watcher.poll().orElseThrow(), "нет файла — комнаты нет");
 		assertTrue(watcher.poll().isEmpty());
 
-		Files.writeString(file, fixture("free.json"));
+		Files.writeString(file, fixture("basic.json"));
 		Files.setLastModifiedTime(file, FileTime.fromMillis(1_000_000));
 		RoomWatcher.Changed changed = (RoomWatcher.Changed) watcher.poll().orElseThrow();
 		assertEquals("K7F-2QX", changed.room().code());

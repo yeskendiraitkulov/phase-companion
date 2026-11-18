@@ -1,0 +1,31 @@
+# Phase Companion для Forge. Справка: https://docs.minecraftforge.net/en/1.21.x/gettingstarted/modfiles/
+modLoader="javafml"
+loaderVersion="[0,)"
+license="MPL-2.0"
+issueTrackerURL="https://github.com/yeskendiraitkulov/phase-companion/issues"
+
+[[mods]]
+modId="phase_companion"
+version="${version}"
+displayName="Phase Companion"
+displayURL="https://phaseclient.com"
+authors="Phase"
+# Мод только для сервера (встроенного сервера хоста): у гостя его быть не должно, и в списке
+# серверов гость без мода не видит красного крестика. Значение из документации Forge
+# («Sides»: «This is what you should use if you're a server only mod»).
+displayTest="IGNORE_SERVER_VERSION"
+description='''Companion to the Phase LAN app: real Tab header, instant name colors and prefixes, up to 20 players in an Open to LAN world. Host only, guests need nothing.'''
+
+[[dependencies.phase_companion]]
+    modId="forge"
+    mandatory=true
+    versionRange="${forge}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.phase_companion]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="${mc}"
+    ordering="NONE"
+    side="BOTH"

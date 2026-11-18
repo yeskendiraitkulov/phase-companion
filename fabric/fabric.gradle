@@ -1,0 +1,33 @@
+// Общая часть сборки адаптеров Fabric. Подключается из fabric/<версия>/build.gradle
+// после плагина Loom; всё, что одинаково у всех загрузчиков, — в loader.gradle.
+
+apply from: rootProject.file('loader.gradle')
+
+def fabricCommon = rootProject.file('fabric/common/src')
+sourceSets.main {
+	java.srcDir(new File(fabricCommon, 'main/java'))
+	resources.srcDir(new File(fabricCommon, 'main/resources'))
+}
+sourceSets.test {
+	java.srcDir(new File(fabricCommon, 'test/java'))
+}
+
+dependencies {
+	// Fabric API не нужен: мод держится на загрузчике и миксинах, поэтому новую версию
+	// игры можно поддержать в день релиза, не дожидаясь Fabric API.
+
+	// Тест запускает игру через загрузчик Fabric без окна: миксины применяются по-настоящему.
+	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
+}
+
+processResources {
+	def props = [
+		version: "${project.mod_version}+fabric.${project.minecraft_version}",
+		mc: project.minecraft_range,
+		java: project.java_version,
+	]
+	inputs.properties props
+	filesMatching('fabric.mod.json') {
+		expand props
+	}
+}

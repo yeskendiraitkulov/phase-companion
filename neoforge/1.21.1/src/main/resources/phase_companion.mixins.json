@@ -1,0 +1,17 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "app.phase.companion.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"MinecraftServerMixin",
+		"PlayerListAccessor",
+		"PlayerListMixin"
+	],
+	"client": [
+		"IntegratedServerMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
