@@ -11,9 +11,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Только Fabric: без Fabric API событий сервера нет, поэтому две точки входа — конец
- * каждого тика сервера и его остановка. Одинаковы с 1.21.1 по 26.x. У Forge и NeoForge
- * то же делают события ({@code ServerLifecycle}).
+ * Fabric only: without Fabric API there are no server events, so there are two entry points: the end of
+ * every server tick and its shutdown. Identical from 1.21.1 through 26.x. On Forge and NeoForge
+ * events do the same ({@code ServerLifecycle}).
  */
 @Mixin(MinecraftServer.class)
 public abstract class ServerHooksMixin {

@@ -1,8 +1,8 @@
-"""Собирает companion.json для релиза: по записи на каждый jar в папке dist/.
+"""Builds companion.json for a release: one entry per jar in the dist/ folder.
 
-Имя файла: phase-companion-<загрузчик>-<версия игры>-<версия мода>.jar.
-Phase читает этот манифест (crates/core/src/companion.rs) и ставит мод у хоста,
-сверяя размер и BLAKE3.
+File name: phase-companion-<loader>-<game version>-<mod version>.jar.
+Phase reads this manifest and installs the mod for the host,
+checking the size and BLAKE3.
 """
 import json
 import re
@@ -17,7 +17,7 @@ mods = []
 for jar in sorted(dist.glob("*.jar")):
     match = pattern.match(jar.name)
     if not match:
-        sys.exit(f"неожиданное имя файла: {jar.name}")
+        sys.exit(f"unexpected file name: {jar.name}")
     loader, mc, version = match.groups()
     data = jar.read_bytes()
     mods.append({
@@ -33,4 +33,4 @@ for jar in sorted(dist.glob("*.jar")):
     json.dumps({"schema": 1, "mods": mods}, indent=2, ensure_ascii=False) + "\n",
     encoding="utf-8",
 )
-print(f"companion.json: {len(mods)} jar")
+print(f"companion.json: {len(mods)} jar(s)")

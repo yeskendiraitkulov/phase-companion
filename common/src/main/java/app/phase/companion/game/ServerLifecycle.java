@@ -3,12 +3,12 @@ package app.phase.companion.game;
 import net.minecraft.server.MinecraftServer;
 
 /**
- * Жизнь {@link Companion} для загрузчиков с событиями сервера (Forge, NeoForge): создаётся
- * на первом тике сервера, останавливается при его остановке. Так же, как миксин тика у
- * Fabric: события Forge и NeoForge стоят в тех же местах игры — конец {@code tickServer} и
- * начало {@code stopServer}.
+ * Lifetime of {@link Companion} for loaders with server events (Forge, NeoForge): created
+ * on the first server tick, stopped when the server stops. Same as the tick mixin on
+ * Fabric: Forge and NeoForge events sit at the same places in the game, the end of {@code tickServer} and
+ * the start of {@code stopServer}.
  *
- * <p>Встроенный сервер в игре один за раз; новый мир — новый сервер и новый {@link Companion}.
+ * <p>Only one integrated server exists at a time; a new world means a new server and a new {@link Companion}.
  */
 public final class ServerLifecycle {
 	private final Platform platform;
@@ -19,7 +19,7 @@ public final class ServerLifecycle {
 		this.platform = platform;
 	}
 
-	/** Конец тика сервера. */
+	/** End of a server tick. */
 	public void tick(MinecraftServer current) {
 		if (current != server) {
 			server = current;
@@ -30,7 +30,7 @@ public final class ServerLifecycle {
 		}
 	}
 
-	/** Начало остановки сервера. */
+	/** Start of server shutdown. */
 	public void stop(MinecraftServer stopping) {
 		if (stopping != server) {
 			return;

@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
-	// ForgeGradle 7: с Forge 1.20.6 игра и в jar, и в игре — в именах Mojang, поэтому без
-	// переназначения имён (reobf) и без refmap; миксины пишутся теми же именами, что у Fabric.
+	// ForgeGradle 7: since Forge 1.20.6 the game uses Mojang names both in the jar and at runtime, so there is no
+	// name remapping (reobf) and no refmap; mixins are written with the same names as on Fabric.
 	id 'net.minecraftforge.gradle' version "${forgegradle_version}"
 }
 
@@ -22,7 +22,7 @@ dependencies {
 	implementation minecraft.dependency("net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}")
 }
 
-// Проверка миксинов по классам игры (common/src/test): общая для Forge и NeoForge.
+// Mixin check against game classes (common/src/test), shared by Forge and NeoForge.
 sourceSets.test.java.srcDir(rootProject.file('common/src/test/java'))
 dependencies {
 	testImplementation "org.ow2.asm:asm-tree:${project.asm_version}"
@@ -43,7 +43,7 @@ processResources {
 
 jar {
 	manifest {
-		// Forge находит список миксинов мода только по этому атрибуту.
+		// Forge finds the mod's mixin list only through this attribute.
 		attributes 'MixinConfigs': 'phase_companion.mixins.json'
 	}
 }

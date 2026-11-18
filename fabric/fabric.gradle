@@ -1,5 +1,5 @@
-// Общая часть сборки адаптеров Fabric. Подключается из fabric/<версия>/build.gradle
-// после плагина Loom; всё, что одинаково у всех загрузчиков, — в loader.gradle.
+// Shared part of the Fabric adapter builds. Applied from fabric/<version>/build.gradle
+// after the Loom plugin; whatever is the same for all loaders lives in loader.gradle.
 
 apply from: rootProject.file('loader.gradle')
 
@@ -13,10 +13,10 @@ sourceSets.test {
 }
 
 dependencies {
-	// Fabric API не нужен: мод держится на загрузчике и миксинах, поэтому новую версию
-	// игры можно поддержать в день релиза, не дожидаясь Fabric API.
+	// Fabric API is not needed: the mod relies on the loader and mixins, so a new game version
+	// can be supported on release day without waiting for Fabric API.
 
-	// Тест запускает игру через загрузчик Fabric без окна: миксины применяются по-настоящему.
+	// The test starts the game through the Fabric loader without a window, so mixins are really applied.
 	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
 }
 

@@ -9,21 +9,21 @@ import java.nio.file.attribute.FileTime;
 import java.util.Optional;
 
 /**
- * Следит за {@code room.json}: раз в секунду смотрит время изменения и перечитывает файл,
- * только когда оно сменилось. Файл маленький (меньше 4 КБ), поэтому читается на потоке
- * сервера; Phase пишет его атомарно (временный файл и переименование).
+ * Watches {@code room.json}: once a second checks the modification time and rereads the file
+ * only when it changed. The file is small (under 4 KB), so it is read on the server
+ * thread; Phase writes it atomically (temp file and rename).
  */
 public final class RoomWatcher {
 
-	/** Состояние после проверки. */
+	/** State after a check. */
 	public sealed interface Result permits Changed, Unsupported {
 	}
 
-	/** Новая комната (или комнаты больше нет). */
+	/** New room (or the room is gone). */
 	public record Changed(Room room) implements Result {
 	}
 
-	/** Файл есть, но в неизвестном формате: мод должен отойти в сторону. */
+	/** File exists but in an unknown format: the mod must stand down. */
 	public record Unsupported(String reason) implements Result {
 	}
 
@@ -39,7 +39,7 @@ public final class RoomWatcher {
 		return file;
 	}
 
-	/** Пусто — ничего не изменилось с прошлой проверки. */
+	/** Empty: nothing changed since the last check. */
 	public Optional<Result> poll() {
 		FileTime modified;
 		try {
@@ -61,7 +61,7 @@ public final class RoomWatcher {
 		try {
 			json = Files.readString(file, StandardCharsets.UTF_8);
 		} catch (IOException err) {
-			// Phase как раз переименовывает файл: попробуем через секунду.
+			// Phase is renaming the file right now: try again in a second.
 			return Optional.empty();
 		}
 		seen = modified;

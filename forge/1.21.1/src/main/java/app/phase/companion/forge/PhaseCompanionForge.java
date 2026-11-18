@@ -11,13 +11,13 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 /**
- * Точка входа Forge. Только серверная логика: ни сетевых каналов, ни блоков, ни предметов —
- * гостю мод не нужен ({@code displayTest} в {@code mods.toml}).
+ * Forge entry point. Server logic only: no network channels, blocks or items;
+ * guests do not need the mod ({@code displayTest} in {@code mods.toml}).
  *
- * <p>Тик и остановку дают события Forge: {@code ServerTickEvent.Post} — в конце
- * {@code tickServer}, {@code ServerStoppingEvent} — перед {@code stopServer} (так их ставит
- * Forge 52 в {@code MinecraftServer}). {@code ServerStoppedEvent} — на случай, если сервер
- * упал и «остановка» не пришла.
+ * <p>Tick and shutdown come from Forge events: {@code ServerTickEvent.Post} at the end of
+ * {@code tickServer}, {@code ServerStoppingEvent} before {@code stopServer} (that is where
+ * Forge 52 places them in {@code MinecraftServer}). {@code ServerStoppedEvent} covers the case
+ * where the server crashed and "stopping" never arrived.
  */
 @Mod("phase_companion")
 public final class PhaseCompanionForge {

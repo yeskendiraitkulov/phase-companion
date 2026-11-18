@@ -1,20 +1,20 @@
-// Общая часть сборки всех адаптеров: <загрузчик>/<версия игры>/build.gradle подключает
-// её после плагина своего загрузчика. Версия игры и Java — в gradle.properties папки версии.
+// Shared part of every adapter build: <loader>/<game version>/build.gradle applies it
+// after its own loader plugin. Game version and Java are in the version folder's gradle.properties.
 //
-// Исходники мода собираются из трёх мест (см. PLAN.md §5):
-//   common/src                 — игровой код, общий для всех загрузчиков и версий (Companion);
-//   common/<версия игры>/src   — то, что у версии игры своё, но одинаково у всех загрузчиков
-//                                (миксины на классы игры, TeamColors);
-//   <загрузчик>/...            — точка входа, метаданные и список миксинов загрузчика.
+// The mod sources come from three places:
+//   common/src                 - game code shared by all loaders and versions (Companion);
+//   common/<game version>/src  - what is specific to a game version but identical across loaders
+//                                (mixins on game classes, TeamColors);
+//   <loader>/...               - the loader's entry point, metadata and mixin list.
 
-// Имя загрузчика — имя родительской папки: fabric, forge, neoforge.
+// The loader name is the parent folder's name: fabric, forge, neoforge.
 def loaderName = project.parent.name
 ext.loaderName = loaderName
 
 group = project.maven_group
 version = project.mod_version
 base {
-	// Имя файла сразу как в релизе: phase-companion-<загрузчик>-<версия игры>-<версия мода>.jar.
+	// File name as in the release: phase-companion-<loader>-<game version>-<mod version>.jar.
 	archivesName = "phase-companion-${loaderName}-${project.minecraft_version}"
 }
 
@@ -41,7 +41,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 jar {
-	// core — часть мода: классы кладутся в тот же jar.
+	// core is part of the mod: its classes go into the same jar.
 	from(project(':core').sourceSets.main.output)
 	from(rootProject.file('LICENSE')) {
 		rename { 'LICENSE_phase_companion' }

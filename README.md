@@ -1,35 +1,37 @@
 # Phase Companion
 
-Бесплатный мод для хоста в приложении Phase: оформляет мир, открытый для сети. Ставится только в игру хоста, гостям он не нужен.
+A free mod for the host of a world opened through the Phase app. It styles the world that is open to LAN. Install it only on the host's game; guests don't need it.
 
-- шапка и подпись в списке игроков (Tab), полоса при входе на 10 секунд;
-- цвета ников и теги вроде `[HOST]`, свечение игроков;
-- больше 8 мест в мире «Открыть для сети», до 50;
-- вход без проверки аккаунта, если хост его включил; второй вход под занятым ником отклоняется.
+- a header and footer in the player list (Tab), plus a bar shown for 10 seconds when someone joins;
+- nickname colors and tags such as `[HOST]`, and player glow;
+- more than 8 slots in an "Open to LAN" world, up to 50;
+- joining without account verification when the host enables it; a second login under a name that is already taken is rejected.
 
-Настройки приходят из окна Phase: мод читает файл `phase/room.json` в папке мира. Сам мод не обращается к сети, не собирает данные и без Phase ничего не меняет.
+Settings come from the Phase window: the mod reads `phase/room.json` in the world folder. The mod makes no network requests, collects no data, and does nothing without Phase.
 
-## Версии
+## Versions
 
-| Загрузчик | Minecraft | Проверка в игре |
+| Loader | Minecraft | Tested in game |
 |---|---|---|
-| Fabric | 26.3 | да |
-| Forge | 1.21.1 | да |
-| Fabric | 1.21.1 | пока нет |
-| NeoForge | 1.21.1 | пока нет |
+| Fabric | 26.3 | yes |
+| Forge | 1.21.1 | yes |
+| Fabric | 1.21.1 | not yet |
+| NeoForge | 1.21.1 | not yet |
 
-Phase ставит подходящий файл сам. Вручную: скачайте jar из [релизов](https://github.com/yeskendiraitkulov/phase-companion/releases/latest) и положите в папку `mods`.
+Phase installs the right file for you. To install manually, download the jar from the [releases](https://github.com/yeskendiraitkulov/phase-companion/releases/latest) and drop it into the `mods` folder.
 
-На Forge и NeoForge игрок без модов войдёт, только если ни один другой мод хоста не требует себя у клиента.
+On Forge and NeoForge a player without mods can join only if none of the host's other mods requires itself on the client.
 
-## Сборка
+## Building
 
 ```bash
 ./gradlew build
 ```
 
-Нужна Java 25 или новее; нужные версии Java для игры Gradle скачает сам. Готовые файлы лежат в `<загрузчик>/<версия>/build/libs`.
+Requires Java 25 or newer; Gradle downloads the Java versions the game needs. The jars end up in `<loader>/<version>/build/libs`.
 
-## Лицензия
+## License
 
-[MPL-2.0](LICENSE). Проект не связан с Mojang и Microsoft.
+[MPL-2.0](LICENSE).
+
+NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.

@@ -1,9 +1,9 @@
-# Phase Companion для NeoForge. Справка: https://docs.neoforged.net/docs/1.21.1/gettingstarted/modfiles/
+# Phase Companion for NeoForge. Reference: https://docs.neoforged.net/docs/1.21.1/gettingstarted/modfiles/
 #
-# Только сервер (встроенный сервер хоста). В NeoForge 1.20.5+ поля displayTest больше нет:
-# совместимость клиента и сервера решают сетевые пакеты модов. Мод не регистрирует ни одного
-# пакета, блока, предмета и записи реестра — гостю без мода (и ванильному клиенту) нечего
-# согласовывать.
+# Server only (the host's integrated server). NeoForge 1.20.5+ has no displayTest field:
+# client/server compatibility is decided by mod network packets. The mod registers no
+# packet, block, item or registry entry, so a guest without the mod (or a vanilla client) has nothing
+# to negotiate.
 modLoader="javafml"
 loaderVersion="[1,)"
 license="MPL-2.0"
@@ -13,7 +13,7 @@ issueTrackerURL="https://github.com/yeskendiraitkulov/phase-companion/issues"
 modId="phase_companion"
 version="${version}"
 displayName="Phase Companion"
-displayURL="https://phaseclient.com"
+displayURL="https://github.com/yeskendiraitkulov/phase-companion"
 authors="Phase"
 description='''Companion to the Phase LAN app: real Tab header, instant name colors and prefixes, up to 20 players in an Open to LAN world. Host only, guests need nothing.'''
 

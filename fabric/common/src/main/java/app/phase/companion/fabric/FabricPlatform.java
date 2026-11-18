@@ -3,11 +3,11 @@ package app.phase.companion.fabric;
 import app.phase.companion.game.Platform;
 import net.fabricmc.loader.api.FabricLoader;
 
-/** Загрузчик Fabric для {@code Companion}. */
+/** Fabric loader for {@code Companion}. */
 public final class FabricPlatform {
 	private FabricPlatform() {}
 
-	/** Версия мода из fabric.mod.json: манифест jar под загрузчиком Fabric не читается. */
+	/** Mod version from fabric.mod.json: the jar manifest is not read under the Fabric loader. */
 	public static Platform get() {
 		String version = FabricLoader.getInstance()
 				.getModContainer("phase_companion")

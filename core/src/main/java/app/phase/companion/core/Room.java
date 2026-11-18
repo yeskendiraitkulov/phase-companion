@@ -3,16 +3,17 @@ package app.phase.companion.core;
 import java.util.List;
 
 /**
- * Комната из {@code <мир>/phase/room.json}, уже проверенная {@link RoomParser}.
+ * The room from {@code <world>/phase/room.json}, already validated by {@link RoomParser}.
  *
- * @param active     оформление включено; {@code false} — убрать из мира всё своё
- * @param accountCheck проверять аккаунт игроков при входе (как в игре); {@code false} —
- *                   пускать без проверки. Не зависит от {@code active}
- * @param title      заголовок шапки ({@code PHASE} или свой заголовок хоста)
- * @param code       код комнаты или {@code null}
- * @param maxPlayers мест в комнате вместе с хостом
- * @param footer     показывать подвал «Работает на Phase» (хост может выключить)
- * @param players    игроки в порядке {@code Tab}: хост, {@code pro} (старый формат), гости, внутри — по нику
+ * @param active     styling is on; {@code false} means remove everything the mod added
+ * @param accountCheck verify players' accounts on login (as in the game); {@code false} means
+ *                   let them in without verification. Independent of {@code active}
+ * @param title      header title ({@code PHASE} or the host's own title)
+ * @param code       room code or {@code null}
+ * @param maxPlayers slots in the room, host included
+ * @param footer     show the "Powered by Phase" footer (the host can turn it off)
+ * @param lang       room language: {@code ru} or {@code en}; {@code ru} if the file has no field
+ * @param players    players in {@code Tab} order: host, {@code pro} (old format), guests, by name within each group
  */
 public record Room(
 		boolean active,
@@ -21,16 +22,20 @@ public record Room(
 		String code,
 		int maxPlayers,
 		boolean footer,
+		String lang,
 		List<RoomPlayer> players) {
 
-	/** Заголовок по умолчанию. */
+	/** Language if the file has none: how every version behaved before translation. */
+	public static final String DEFAULT_LANG = "ru";
+
+	/** Default title. */
 	public static final String DEFAULT_TITLE = "PHASE";
 
-	/** Комнаты нет: файл отсутствует, закрыт или в неизвестном формате. */
-	public static final Room CLOSED = new Room(false, true, DEFAULT_TITLE, null, 0, true, List.of());
+	/** No room: the file is missing, closed or in an unknown format. */
+	public static final Room CLOSED = new Room(false, true, DEFAULT_TITLE, null, 0, true, DEFAULT_LANG, List.of());
 
-	/** Оформления нет, но игроков пускают без проверки аккаунта. */
-	public static final Room PLAIN_OPEN = new Room(false, false, DEFAULT_TITLE, null, 0, true, List.of());
+	/** No styling, but players are let in without account verification. */
+	public static final Room PLAIN_OPEN = new Room(false, false, DEFAULT_TITLE, null, 0, true, DEFAULT_LANG, List.of());
 
 	public Room {
 		players = List.copyOf(players);

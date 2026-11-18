@@ -11,12 +11,12 @@ import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /**
- * Точка входа NeoForge. Только серверная логика: мод не регистрирует ни сетевых пакетов,
- * ни блоков, ни предметов — гостю (и ванильному клиенту) согласовывать нечего.
+ * NeoForge entry point. Server logic only: the mod registers no network packets,
+ * blocks or items, so there is nothing for a guest (or a vanilla client) to negotiate.
  *
- * <p>Тик и остановку дают события NeoForge: {@code ServerTickEvent.Post} — в конце
- * {@code tickServer}, {@code ServerStoppingEvent} — перед {@code stopServer}.
- * {@code ServerStoppedEvent} — на случай, если сервер упал и «остановка» не пришла.
+ * <p>Tick and shutdown come from NeoForge events: {@code ServerTickEvent.Post} at the end of
+ * {@code tickServer}, {@code ServerStoppingEvent} before {@code stopServer}.
+ * {@code ServerStoppedEvent} covers the case where the server crashed and "stopping" never arrived.
  */
 @Mod("phase_companion")
 public final class PhaseCompanionNeoForge {

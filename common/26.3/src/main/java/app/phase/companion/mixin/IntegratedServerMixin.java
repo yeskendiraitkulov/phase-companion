@@ -9,9 +9,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Лимит мира «Открыть для сети»: в 26.x игра отвечает 8 прямо из
- * {@code IntegratedServer.getMaxPlayers()}, поля лимита в {@code PlayerList} больше нет —
- * мод подменяет ответ числом из комнаты (до 50).
+ * Player cap of an "Open to LAN" world: in 26.x the game answers 8 directly from
+ * {@code IntegratedServer.getMaxPlayers()} and {@code PlayerList} no longer has a limit field,
+ * so the mod replaces the answer with the number from the room (up to 50).
  */
 @Mixin(IntegratedServer.class)
 public abstract class IntegratedServerMixin implements PlayerLimit {

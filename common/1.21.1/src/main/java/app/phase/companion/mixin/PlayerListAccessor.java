@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-/** До 26.x лимит — поле {@code PlayerList.maxPlayers}: его читает и проверка входа, и ответ на пинг. */
+/** Before 26.x the limit is the {@code PlayerList.maxPlayers} field, read by both the login check and the ping reply. */
 @Mixin(PlayerList.class)
 public interface PlayerListAccessor {
 	@Accessor("maxPlayers")

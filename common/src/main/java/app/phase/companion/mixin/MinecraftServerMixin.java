@@ -6,9 +6,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 /**
- * Состояние мода на сервере: пускает ли он без проверки аккаунта ({@link PhaseServer}).
- * Его читает {@code PlayerListMixin} при входе игрока. Общий для всех загрузчиков; тик и
- * остановку у Fabric ловит {@code ServerHooksMixin}, у Forge и NeoForge — события.
+ * Mod state on the server: whether it lets players in without account verification ({@link PhaseServer}).
+ * Read by {@code PlayerListMixin} when a player joins. Shared by all loaders; on Fabric the tick and
+ * stop are caught by {@code ServerHooksMixin}, on Forge and NeoForge by events.
  */
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin implements PhaseServer {

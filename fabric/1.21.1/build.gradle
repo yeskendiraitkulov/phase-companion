@@ -1,5 +1,5 @@
 plugins {
-	// 1.21.1 выходит обфусцированной: Loom переназначает имена, код пишется в маппингах Mojang.
+	// 1.21.1 ships obfuscated: Loom remaps the names, and the code is written against Mojang mappings.
 	id 'net.fabricmc.fabric-loom-remap'
 }
 

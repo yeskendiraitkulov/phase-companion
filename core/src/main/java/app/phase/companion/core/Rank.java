@@ -1,6 +1,6 @@
 package app.phase.companion.core;
 
-/** Кто игрок в комнате. Порядок — порядок в {@code Tab}: хост первым. */
+/** Who the player is in the room. Order is the {@code Tab} order: host first. */
 public enum Rank {
 	HOST('a'),
 	PRO('b'),
@@ -12,12 +12,12 @@ public enum Rank {
 		this.letter = letter;
 	}
 
-	/** Буква в имени команды: {@code Tab} сортирует игроков по имени команды. */
+	/** Letter in the team name: {@code Tab} sorts players by team name. */
 	public char letter() {
 		return letter;
 	}
 
-	/** Значение из {@code room.json}; неизвестное — гость. */
+	/** Value from {@code room.json}; an unknown one means guest. */
 	public static Rank parse(String raw) {
 		if (raw == null) {
 			return GUEST;

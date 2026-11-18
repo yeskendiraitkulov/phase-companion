@@ -1,5 +1,5 @@
 plugins {
-	// 26.x выходит без обфускации: Loom без переназначения имён и без маппингов.
+	// 26.x ships unobfuscated: Loom without name remapping and without mappings.
 	id 'net.fabricmc.fabric-loom'
 }
 

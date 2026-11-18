@@ -1,7 +1,7 @@
 name: release
 
-# Тег v* (например v0.1.0) собирает мод и выкладывает релиз: jar и companion.json.
-# Phase берёт companion.json из «latest release» и ставит мод у хоста одной кнопкой.
+# A v* tag (for example v0.1.0) builds the mod and publishes a release: jars and companion.json.
+# Phase takes companion.json from the latest release and installs the mod for the host in one click.
 on:
   push:
     tags: ["v*"]
@@ -27,17 +27,17 @@ jobs:
           chmod +x gradlew
           ./gradlew build
       - name: Collect jars
-        # Каждый адаптер <загрузчик>/<версия игры> (fabric, forge, neoforge) сам называет jar
-        # как в релизе: phase-companion-<загрузчик>-<версия игры>-<версия мода>.jar.
-        # Gradle идёт на Java 25: на ней же ForgeGradle запускает свои инструменты; jar для
-        # 1.21.1 собираются под Java 21 (options.release), недостающую Java Gradle скачает сам.
+        # Each <loader>/<game version> adapter (fabric, forge, neoforge) names its jar
+        # as in the release: phase-companion-<loader>-<game version>-<mod version>.jar.
+        # Gradle runs on Java 25, which ForgeGradle also uses to run its tools; the 1.21.1
+        # jars are built for Java 21 (options.release), and Gradle downloads any missing Java itself.
         run: |
           mkdir dist
           for loader in fabric forge neoforge; do
             cp $loader/*/build/libs/phase-companion-$loader-*.jar dist/
           done
           ls -l dist
-          # Сколько адаптеров, столько и jar: ни один загрузчик не выпал из релиза молча.
+          # One jar per adapter: no loader silently drops out of the release.
           test "$(ls dist/*.jar | wc -l)" -eq "$(ls -d {fabric,forge,neoforge}/*/build.gradle | wc -l)"
       - name: Manifest
         run: python tools/make_manifest.py "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" dist

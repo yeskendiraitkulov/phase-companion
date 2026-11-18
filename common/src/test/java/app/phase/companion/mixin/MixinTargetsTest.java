@@ -31,13 +31,13 @@ import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
 /**
- * Миксины мода встают на классы этой версии игры — проверка без запуска игры (Forge и
- * NeoForge: их загрузчик не запускается в JUnit так просто, как Fabric).
+ * The mod's mixins land on classes of this game version: a check without launching the game (Forge and
+ * NeoForge: their loader does not start inside JUnit as easily as Fabric's).
  *
- * <p>Читает байт-код миксинов и классов игры (имена Mojang — те же, что у Forge и NeoForge в
- * игре) и сверяет: класс-цель есть, у {@code @Inject} есть метод-цель с теми же параметрами,
- * у {@code @Accessor} есть поле того же типа. И что каждый миксин из пакета записан в
- * {@code phase_companion.mixins.json}, а каждый записанный — существует.
+ * <p>Reads the bytecode of the mixins and of game classes (Mojang names, the same as Forge and NeoForge use in
+ * the game) and checks: the target class exists, every {@code @Inject} has a target method with the same parameters,
+ * every {@code @Accessor} has a field of the same type. Also that every mixin in the package is listed in
+ * {@code phase_companion.mixins.json} and every listed one exists.
  */
 class MixinTargetsTest {
 	private static final String PACKAGE = "app/phase/companion/mixin/";
@@ -51,7 +51,7 @@ class MixinTargetsTest {
 		assertEquals("app.phase.companion.mixin", config.get("package").getAsString());
 		assertTrue(config.get("required").getAsBoolean(), "required");
 		assertEquals(1, config.getAsJsonObject("injectors").get("defaultRequire").getAsInt(), "defaultRequire");
-		assertEquals(compiledMixins(), listed(config), "миксины в пакете и в phase_companion.mixins.json");
+		assertEquals(compiledMixins(), listed(config), "mixins in the package and in phase_companion.mixins.json");
 	}
 
 	@Test
@@ -60,7 +60,7 @@ class MixinTargetsTest {
 		for (String name : listed(config())) {
 			ClassNode mixin = read(PACKAGE + name);
 			List<Type> targets = targets(mixin);
-			assertFalse(targets.isEmpty(), name + ": нет @Mixin");
+			assertFalse(targets.isEmpty(), name + ": no @Mixin");
 			for (Type target : targets) {
 				ClassNode game = read(target.getInternalName());
 				for (MethodNode method : mixin.methods) {
@@ -79,35 +79,35 @@ class MixinTargetsTest {
 				}
 			}
 		}
-		assertTrue(checked > 0, "ни одной точки миксина не проверено");
+		assertTrue(checked > 0, "no mixin injection points were checked");
 	}
 
 	private static void assertInjectTarget(String mixin, ClassNode game, String wanted, MethodNode handler) {
 		String targetName = wanted.contains("(") ? wanted.substring(0, wanted.indexOf('(')) : wanted;
-		// Параметры обработчика: параметры цели и в конце CallbackInfo(Returnable).
+		// Handler parameters: the target's parameters, then CallbackInfo(Returnable) at the end.
 		Type[] handlerArgs = Type.getArgumentTypes(handler.desc);
 		Type[] expected = Arrays.copyOf(handlerArgs, handlerArgs.length - 1);
 		String callback = handlerArgs[handlerArgs.length - 1].getInternalName();
 		assertTrue(callback.startsWith("org/spongepowered/asm/mixin/injection/callback/CallbackInfo"),
-				mixin + "." + handler.name + ": последний параметр — CallbackInfo");
+				mixin + "." + handler.name + ": last parameter is CallbackInfo");
 		boolean found = game.methods.stream()
 				.filter(m -> m.name.equals(targetName))
 				.anyMatch(m -> Arrays.equals(Type.getArgumentTypes(m.desc), expected));
-		assertTrue(found, mixin + ": в " + game.name + " нет " + targetName
+		assertTrue(found, mixin + ": " + game.name + " has no " + targetName
 				+ Arrays.stream(expected).map(Type::getClassName).collect(Collectors.joining(", ", "(", ")")));
 	}
 
 	private static void assertAccessorTarget(String mixin, ClassNode game, AnnotationNode accessor, MethodNode method) {
 		List<String> names = strings(accessor, "value");
-		assertEquals(1, names.size(), mixin + "." + method.name + ": имя поля в @Accessor");
+		assertEquals(1, names.size(), mixin + "." + method.name + ": field name in @Accessor");
 		Type[] args = Type.getArgumentTypes(method.desc);
 		Type type = args.length == 0 ? Type.getReturnType(method.desc) : args[0];
 		FieldNode field = game.fields.stream().filter(f -> f.name.equals(names.get(0))).findFirst().orElse(null);
-		assertNotNull(field, mixin + ": в " + game.name + " нет поля " + names.get(0));
-		assertEquals(type.getDescriptor(), field.desc, mixin + ": тип поля " + names.get(0));
+		assertNotNull(field, mixin + ": " + game.name + " has no field " + names.get(0));
+		assertEquals(type.getDescriptor(), field.desc, mixin + ": field type " + names.get(0));
 	}
 
-	// ------------------------------------------------------------------ чтение
+	// ------------------------------------------------------------------ reading
 
 	private static JsonObject config() throws IOException {
 		try (InputStream in = resource("phase_companion.mixins.json")) {
@@ -125,10 +125,10 @@ class MixinTargetsTest {
 		return names;
 	}
 
-	/** Миксины, собранные в этот проект: все классы пакета, кроме вложенных. */
+	/** Mixins built into this project: all classes in the package except nested ones. */
 	private static Set<String> compiledMixins() throws IOException, URISyntaxException {
 		URL known = MixinTargetsTest.class.getClassLoader().getResource(PACKAGE + "MinecraftServerMixin.class");
-		assertNotNull(known, "MinecraftServerMixin не собран");
+		assertNotNull(known, "MinecraftServerMixin was not built");
 		Path dir = Path.of(known.toURI()).getParent();
 		try (Stream<Path> files = Files.list(dir)) {
 			return files.map(p -> p.getFileName().toString())
@@ -149,7 +149,7 @@ class MixinTargetsTest {
 
 	private static InputStream resource(String path) {
 		InputStream in = MixinTargetsTest.class.getClassLoader().getResourceAsStream(path);
-		assertNotNull(in, "нет на classpath: " + path);
+		assertNotNull(in, "not on the classpath: " + path);
 		return in;
 	}
 
@@ -176,7 +176,7 @@ class MixinTargetsTest {
 		return values(annotation, key).stream().map(String.class::cast).toList();
 	}
 
-	/** Значение поля аннотации: массив или одно значение — всегда списком. */
+	/** Annotation field value: an array or a single value, always as a list. */
 	private static List<Object> values(AnnotationNode annotation, String key) {
 		if (annotation.values == null) {
 			return List.of();

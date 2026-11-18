@@ -28,26 +28,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Phase Companion в одном мире: живёт от первого тика встроенного сервера до остановки.
+ * Phase Companion inside one world: lives from the integrated server's first tick until it stops.
  *
- * <p>Всё на потоке сервера. Раз в секунду: пульс для датапака, проверка {@code room.json}.
- * Каждый тик — только сравнение числа игроков, чтобы обновить шапку при входе и выходе.
+ * <p>Everything runs on the server thread. Once a second: the datapack pulse and a {@code room.json} check.
+ * Every tick only compares the player count, to refresh the header when someone joins or leaves.
  *
- * <p>Код общий для всех загрузчиков и версий игры: трогает только классы самой игры.
- * Что у загрузчика своё — как вызываются {@link #tick()} и {@link #stop()} и откуда
- * берётся версия мода ({@link Platform}).
+ * <p>Shared by all loaders and game versions: touches only game classes.
+ * What differs per loader is how {@link #tick()} and {@link #stop()} are called and where
+ * the mod version comes from ({@link Platform}).
  */
 public final class Companion {
 	static final Logger LOG = LoggerFactory.getLogger("phase_companion");
 
-	/** Совпадает с {@code COMPANION_SCORE} и {@code COMPANION_PULSE} в {@code datapack.rs}. */
+	/** Matches {@code COMPANION_SCORE} and {@code COMPANION_PULSE} in {@code datapack.rs}. */
 	static final String PULSE_HOLDER = "#companion";
 	static final int PULSE = 5;
 	static final String META_OBJECTIVE = "phase.meta";
 
 	private static final int ACCENT = RoomParser.DEFAULT_ACCENT;
 	private static final int SECOND = 20;
-	/** Сколько видна полоса при входе: 10 секунд, как у датапака. */
+	/** How long the join bar stays visible: 10 seconds, same as the datapack. */
 	private static final int WELCOME_TICKS = 10 * SECOND;
 
 	private final MinecraftServer server;
@@ -55,18 +55,18 @@ public final class Companion {
 	private final Path phaseDir;
 	private final RoomWatcher watcher;
 	private final int vanillaMax;
-	/** Проверка аккаунта, как её настроила игра: её мод и возвращает. */
+	/** Account verification as the game configured it; the mod restores exactly that. */
 	private final boolean vanillaAuth;
 
 	private Room room = Room.CLOSED;
-	/** Файл в незнакомом формате: мод молчит, оформление делает датапак. */
+	/** File in an unknown format: the mod stays quiet and the datapack does the styling. */
 	private boolean standingDown;
 	private boolean aliveWritten;
 	private int ticks;
 	private int lastOnline = -1;
-	/** Тик, когда убрать полосу при входе; -1 — полосы нет. */
+	/** Tick at which to hide the join bar; -1 means no bar. */
 	private int hideBarAt = -1;
-	/** Кому мод включил свечение: выключает только им, чужое свечение не трогает. */
+	/** Players the mod enabled glow for: only those are turned off again, glow set by others is left alone. */
 	private final Set<String> glowing = new HashSet<>();
 
 	private Companion(MinecraftServer server, Platform platform) {
@@ -79,13 +79,13 @@ public final class Companion {
 		this.vanillaAuth = server.usesAuthentication();
 	}
 
-	/** Только встроенный сервер одиночной игры: свой сервер настраивается сам. */
+	/** Integrated singleplayer server only; a dedicated server configures itself. */
 	public static Companion create(MinecraftServer server, Platform platform) {
 		if (server.isDedicatedServer()) {
 			return null;
 		}
-		// Путь корня мира кончается на «.»: имя папки берём у нормализованного пути.
-		LOG.info("Phase Companion {}: мир «{}»", platform.version(),
+		// The world root path ends in ".": take the folder name from the normalized path.
+		LOG.info("Phase Companion {}: world '{}'", platform.version(),
 				server.getWorldPath(LevelResource.ROOT).toAbsolutePath().normalize().getFileName());
 		return new Companion(server, platform);
 	}
@@ -132,12 +132,12 @@ public final class Companion {
 
 	public void stop() {
 		restoreAccess();
-		// Команды остаются в сохранении, как у датапака: при следующем открытии мира Phase
-		// или мод приведут их к текущей комнате, закрытая комната их уберёт.
+		// Commands stay in the save, like the datapack's: the next time the world opens, Phase
+		// or the mod will bring them in line with the current room; a closed room removes them.
 		glowing.clear();
 	}
 
-	// ------------------------------------------------------------------ применение
+	// ------------------------------------------------------------------ applying
 
 	private void apply(Room next) {
 		boolean wasActive = room.active();
@@ -147,8 +147,8 @@ public final class Companion {
 		((PlayerLimit) server).phase$setPlayerLimit(RoomPlan.maxPlayers(vanillaMax, room));
 		if (room.active()) {
 			sendTabList(server.getPlayerCount());
-			// Шапка при входе на 10 секунд, как у датапака (окно Phase её обещает): когда
-			// комната открылась. Дальше — при каждом входе (tick); правка оформления её не зовёт.
+			// Header on join for 10 seconds, like the datapack (the Phase window promises it): when the
+			// room opened. After that on every join (tick); a styling edit does not trigger it.
 			if (!wasActive) {
 				showWelcomeBar(server.getPlayerCount());
 			}
@@ -162,10 +162,10 @@ public final class Companion {
 					player.setGlowingTag(false);
 				}
 			}
-			// Как у уборки датапака: Phase может удалить датапак из мира.
+			// Same as the datapack cleanup: Phase may delete the datapack from the world.
 			command("data modify storage phase:state clean set value 1b");
 		}
-		LOG.info("Phase Companion: комната {}", room.active() ? "открыта, мест " + room.maxPlayers() : "закрыта");
+		LOG.info("Phase Companion: room {}", room.active() ? "open, slots: " + room.maxPlayers() : "closed");
 	}
 
 	private void applyTeams() {
@@ -189,7 +189,7 @@ public final class Companion {
 			team.setPlayerPrefix(prefix == null
 					? Component.empty()
 					: Component.literal(prefix).withStyle(s -> s.withColor(style.prefixColor())));
-			// Только свободные: команду карты или другого датапака Phase не трогает.
+			// Free ones only: Phase does not touch a command from a map or another datapack.
 			PlayerTeam current = scoreboard.getPlayersTeam(spec.player());
 			if (current == null || (RoomPlan.isPhaseTeam(current.getName()) && current != team)) {
 				scoreboard.addPlayerToTeam(spec.player(), team);
@@ -200,22 +200,22 @@ public final class Companion {
 	private void sendTabList(int online) {
 		MutableComponent header = Component.empty()
 				.append(Component.literal(room.title()).withStyle(s -> s.withColor(ACCENT).withBold(true)))
-				.append(Component.literal(RoomPlan.headerMiddle(room) + online + " онлайн").withStyle(ChatFormatting.WHITE));
+				.append(Component.literal(RoomPlan.headerMiddle(room) + online + RoomPlan.onlineWord(room)).withStyle(ChatFormatting.WHITE));
 		Component footer = room.footer()
-				? Component.literal("Работает на Phase").withStyle(ChatFormatting.GRAY)
+				? Component.literal(RoomPlan.footerText(room)).withStyle(ChatFormatting.GRAY)
 				: Component.empty();
 		server.getPlayerList().broadcastAll(new ClientboundTabListPacket(header, footer));
 	}
 
 	/**
-	 * Полоса сверху экрана «PHASE • код • N онлайн» всем игрокам на {@link #WELCOME_TICKS}:
-	 * при открытии комнаты и при каждом входе. Командами игры, а не API боссбара: синтаксис
-	 * команд один на всех версиях и загрузчиках, как у датапака (то же имя `phase:room`).
+	 * Top-of-screen bar "PHASE • code • N online" for all players for {@link #WELCOME_TICKS}:
+	 * when the room opens and on every join. Done with game commands, not the bossbar API: the command
+	 * syntax is the same on all versions and loaders, like the datapack's (same `phase:room` name).
 	 */
 	private void showWelcomeBar(int online) {
-		// Датапак при загрузке мира тоже показал эту полосу и завёл `phase:hide` через 200
-		// тиков игрового времени — а пока открыто меню Esc, одиночный мир на паузе, и его
-		// таймер срабатывает уже после нашего показа. Полосу ведёт мод: таймер датапака снимаем.
+		// The datapack also showed this bar when the world loaded and scheduled `phase:hide` in 200
+		// game ticks, but while the Esc menu is open a singleplayer world is paused and its timer
+		// fires after our show. The mod drives the bar, so we cancel the datapack's timer.
 		command("schedule clear phase:hide");
 		command("bossbar add phase:room {\"text\":\"PHASE\"}");
 		command("bossbar set phase:room color blue");
@@ -223,13 +223,13 @@ public final class Companion {
 		command("bossbar set phase:room value " + Math.min(online, Math.max(1, room.maxPlayers())));
 		command("bossbar set phase:room name [{\"text\":" + quote(room.title())
 				+ ",\"color\":\"" + String.format("#%06X", ACCENT & 0xFFFFFF) + "\",\"bold\":true},{\"text\":"
-				+ quote(RoomPlan.headerMiddle(room) + online + " онлайн") + ",\"color\":\"white\",\"bold\":false}]");
+				+ quote(RoomPlan.headerMiddle(room) + online + RoomPlan.onlineWord(room)) +",\"color\":\"white\",\"bold\":false}]");
 		command("bossbar set phase:room players @a");
 		command("bossbar set phase:room visible true");
 		hideBarAt = ticks + WELCOME_TICKS;
 	}
 
-	/** Строка для текста в команде: кавычки и обратная косая черта экранируются. */
+	/** String for command text: quotes and backslashes are escaped. */
 	private static String quote(String text) {
 		return "\"" + text.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
 	}
@@ -247,7 +247,7 @@ public final class Companion {
 		}
 	}
 
-	/** Пульс для датапака: пока он больше нуля, датапак не применяет оформление сам. */
+	/** Pulse for the datapack: while it is above zero the datapack does not apply styling itself. */
 	private void pulse() {
 		Scoreboard scoreboard = server.getScoreboard();
 		Objective meta = scoreboard.getObjective(META_OBJECTIVE);
@@ -258,7 +258,7 @@ public final class Companion {
 
 	private void standDown(String reason) {
 		if (!standingDown) {
-			LOG.warn("Phase Companion отходит в сторону: {}", reason);
+			LOG.warn("Phase Companion standing down: {}", reason);
 		}
 		standingDown = true;
 		room = Room.CLOSED;
@@ -267,9 +267,9 @@ public final class Companion {
 	}
 
 	/**
-	 * Вход без проверки аккаунта — по настройке хоста в Phase. Проверяется раз в секунду:
-	 * если игра сама вернула проверку (например, при открытии для сети), мод снимает её
-	 * снова, пока настройка не изменится.
+	 * Login without account verification, per the host's setting in Phase. Checked once a second:
+	 * if the game restored verification itself (for example on Open to LAN), the mod turns it off
+	 * again until the setting changes.
 	 */
 	private void applyAccess() {
 		if (room.accountCheck()) {
@@ -279,9 +279,9 @@ public final class Companion {
 		PhaseServer phase = (PhaseServer) server;
 		if (!phase.phase$guardNames()) {
 			phase.phase$setGuardNames(true);
-			LOG.info("Phase Companion: игроков пускают без проверки аккаунта (настройка хоста в Phase), занятый ник отклоняется");
+			LOG.info("Phase Companion: players join without account verification (host setting in Phase), a taken name is rejected");
 		}
-		// Игра могла вернуть проверку сама — снимаем молча, журнал не засоряем.
+		// The game may have restored verification itself: turn it off quietly, without spamming the log.
 		if (server.usesAuthentication()) {
 			server.setUsesAuthentication(false);
 		}
@@ -294,12 +294,12 @@ public final class Companion {
 		}
 		phase.phase$setGuardNames(false);
 		server.setUsesAuthentication(vanillaAuth);
-		LOG.info("Phase Companion: проверка аккаунта при входе снова как в игре");
+		LOG.info("Phase Companion: login verification is back to the game default");
 	}
 
 	/**
-	 * Отметка для Phase: мод работает в этом мире. Пишется, когда в мире появилась папка
-	 * Phase; Phase сверяет время файла с открытием мира.
+	 * Marker for Phase: the mod is working in this world. Written once the world has a Phase
+	 * folder; Phase compares the file time with the moment the world was opened.
 	 */
 	private void writeAliveOnce() {
 		if (aliveWritten || !Files.isDirectory(phaseDir)) {
@@ -313,7 +313,7 @@ public final class Companion {
 			Files.writeString(tmp, body, StandardCharsets.UTF_8);
 			Files.move(tmp, phaseDir.resolve("companion.ok"), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException err) {
-			LOG.warn("Phase Companion: не удалось записать companion.ok: {}", err.toString());
+			LOG.warn("Phase Companion: could not write companion.ok: {}", err.toString());
 		}
 	}
 

@@ -12,15 +12,15 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- * Читает {@code room.json}. Phase уже проверил значения, но мод проверяет их снова: файл
- * лежит в папке мира, и его может поправить кто угодно. Плохое поле не ломает комнату —
- * оно просто отбрасывается, как в датапаке.
+ * Reads {@code room.json}. Phase has already checked the values, but the mod checks them again: the file
+ * sits in the world folder and anyone can edit it. A bad field does not break the room;
+ * it is simply dropped, like in the datapack.
  */
 public final class RoomParser {
 
-	/** Версия формата, которую понимает мод. Другая — мод молчит, работает датапак. */
+	/** Format version the mod understands. Any other: the mod stays quiet and the datapack works. */
 	public static final int SCHEMA = 1;
-	/** Больше игроков мод не открывает: встроенный сервер работает на ПК хоста в одном потоке. Тот же предел у Phase ({@code look::MAX_SLOTS}). */
+	/** The mod never opens more slots: the integrated server runs on the host's PC in a single thread. Same cap in Phase ({@code look::MAX_SLOTS}). */
 	public static final int MAX_PLAYERS_CAP = 50;
 
 	static final int TITLE_MAX_CHARS = 32;
@@ -30,17 +30,17 @@ public final class RoomParser {
 	private static final Pattern NAME = Pattern.compile("[A-Za-z0-9_]{1,16}");
 	private static final Pattern CODE = Pattern.compile("[A-Za-z0-9-]{1," + CODE_MAX_CHARS + "}");
 	private static final Pattern HEX = Pattern.compile("#[0-9A-Fa-f]{6}");
-	/** Цвета ника — именованные цвета игры: команда другого не принимает. */
+	/** Name colors are the game's named colors: a team accepts no others. */
 	static final Set<String> NAME_COLORS = Set.of(
 			"black", "dark_blue", "dark_green", "dark_aqua", "dark_red", "dark_purple", "gold",
 			"gray", "dark_gray", "blue", "green", "aqua", "red", "light_purple", "yellow", "white");
-	/** Цвет префикса по умолчанию — Ice Sapphire. */
+	/** Default prefix color: Ice Sapphire. */
 	public static final int DEFAULT_ACCENT = 0x38BDF8;
 
 	private RoomParser() {
 	}
 
-	/** Файл в неизвестном формате: мод не трогает мир. */
+	/** File in an unknown format: the mod does not touch the world. */
 	public static final class UnsupportedRoomException extends Exception {
 		public UnsupportedRoomException(String message) {
 			super(message);
@@ -52,17 +52,17 @@ public final class RoomParser {
 		try {
 			JsonElement element = JsonParser.parseString(json);
 			if (!element.isJsonObject()) {
-				throw new UnsupportedRoomException("room.json — не объект");
+				throw new UnsupportedRoomException("room.json is not an object");
 			}
 			root = element.getAsJsonObject();
 		} catch (RuntimeException err) {
-			throw new UnsupportedRoomException("room.json не читается: " + err.getMessage());
+			throw new UnsupportedRoomException("room.json is unreadable: " + err.getMessage());
 		}
 		int schema = intOr(root, "schema", -1);
 		if (schema != SCHEMA) {
-			throw new UnsupportedRoomException("неизвестная версия формата: " + schema);
+			throw new UnsupportedRoomException("unknown format version: " + schema);
 		}
-		// Нет поля — проверка как в игре: так безопаснее для старых файлов.
+		// No field: verification as in the game, which is safer for old files.
 		boolean accountCheck = boolOr(root, "account_check", true);
 		if (!boolOr(root, "active", false)) {
 			return accountCheck ? Room.CLOSED : Room.PLAIN_OPEN;
@@ -74,7 +74,20 @@ public final class RoomParser {
 		}
 		int maxPlayers = Math.max(1, Math.min(intOr(root, "max_players", 1), 100));
 		boolean footer = boolOr(root, "footer", true);
-		return new Room(true, accountCheck, title, code, maxPlayers, footer, players(root));
+		return new Room(true, accountCheck, title, code, maxPlayers, footer,
+				lang(stringOr(root, "lang", null)), players(root));
+	}
+
+	/**
+	 * Room language. No field (file from an old Phase version) means Russian, as earlier
+	 * versions behaved; a code the mod does not know means English, like in Phase.
+	 */
+	static String lang(String raw) {
+		if (raw == null) {
+			return Room.DEFAULT_LANG;
+		}
+		String primary = raw.trim().split("[-_]", 2)[0].toLowerCase(Locale.ROOT);
+		return primary.equals("ru") ? "ru" : "en";
 	}
 
 	private static List<RoomPlayer> players(JsonObject root) {
@@ -114,7 +127,7 @@ public final class RoomParser {
 		return out;
 	}
 
-	/** Заголовок: пробелы подряд — один, от 1 до 32 знаков, без опасных знаков. */
+	/** Title: runs of spaces collapse to one, 1 to 32 characters, no dangerous characters. */
 	static String title(String raw) {
 		if (raw == null) {
 			return Room.DEFAULT_TITLE;
@@ -127,7 +140,7 @@ public final class RoomParser {
 		return title;
 	}
 
-	/** Префикс: 1–8 знаков, буквы и цифры любого алфавита и {@code - _ . ! + * # &}. */
+	/** Prefix: 1-8 characters, letters and digits of any alphabet and {@code - _ . ! + * # &}. */
 	static String prefix(String raw) {
 		if (raw == null) {
 			return null;
@@ -142,7 +155,7 @@ public final class RoomParser {
 		return ok ? prefix : null;
 	}
 
-	/** То же правило, что в Phase: управляющие, кавычка, {@code \}, {@code §} и невидимые знаки. */
+	/** Same rule as in Phase: control characters, quote, {@code \}, {@code §} and invisible characters. */
 	static boolean isUnsafe(int c) {
 		return Character.isISOControl(c)
 				|| c == '"' || c == '\\' || c == '§'

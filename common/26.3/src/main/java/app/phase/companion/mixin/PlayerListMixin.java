@@ -11,9 +11,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Без проверки аккаунта игра верит нику и при совпадении выбрасывает того, кто уже в
- * мире. Пока мод так пускает игроков, второй вход под тем же ником отклоняется —
- * ванильной причиной «ник занят».
+ * Without account verification the game trusts the nickname and kicks whoever is already
+ * in the world on a match. While the mod lets players in this way, a second login under the same name
+ * is rejected with the vanilla "name taken" reason.
  */
 @Mixin(PlayerList.class)
 public abstract class PlayerListMixin {

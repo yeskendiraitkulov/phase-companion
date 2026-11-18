@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	// ModDevGradle: с 1.20.5 NeoForge работает в именах Mojang — без переназначения и refmap.
+	// ModDevGradle: since 1.20.5 NeoForge uses Mojang names, so no remapping and no refmap.
 	id 'net.neoforged.moddev' version "${moddev_version}"
 }
 
@@ -14,14 +14,14 @@ repositories {
 	mavenCentral()
 }
 
-// Проверка миксинов по классам игры (common/src/test): общая для Forge и NeoForge.
+// Mixin check against game classes (common/src/test), shared by Forge and NeoForge.
 sourceSets.test.java.srcDir(rootProject.file('common/src/test/java'))
 dependencies {
 	testImplementation "org.ow2.asm:asm-tree:${project.asm_version}"
 	testImplementation "com.google.code.gson:gson:${project.gson_version}"
 }
-// ModDevGradle кладёт игру в тесты только вместе с запуском игры (unitTest); тесту хватает
-// байт-кода классов игры — тех же, с которыми собран мод.
+// ModDevGradle puts the game on the test classpath only together with a game launch (unitTest); the test only needs
+// the bytecode of the game classes, the same ones the mod is built against.
 sourceSets.test.runtimeClasspath += sourceSets.main.compileClasspath
 
 processResources {

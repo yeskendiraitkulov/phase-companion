@@ -11,20 +11,20 @@ import net.minecraft.server.players.PlayerList;
 import org.junit.jupiter.api.Test;
 
 /**
- * Миксины встают на классы этой версии игры: загрузчик Fabric применяет их при загрузке
- * класса, а {@code defaultRequire: 1} роняет загрузку, если точка входа не нашлась.
+ * The mixins land on classes of this game version: the Fabric loader applies them when the
+ * class loads, and {@code defaultRequire: 1} fails the load if an injection point is not found.
  */
 class MixinsApplyTest {
 	@Test
 	void mixinsApplyToServerClasses() {
 		assertTrue(PhaseServer.class.isAssignableFrom(MinecraftServer.class), "MinecraftServerMixin");
-		assertTrue(injected(MinecraftServer.class, "phase$tick"), "конец тика");
-		assertTrue(injected(MinecraftServer.class, "phase$stop"), "остановка");
+		assertTrue(injected(MinecraftServer.class, "phase$tick"), "end of tick");
+		assertTrue(injected(MinecraftServer.class, "phase$stop"), "shutdown");
 		assertTrue(PlayerLimit.class.isAssignableFrom(IntegratedServer.class), "IntegratedServerMixin");
-		assertTrue(injected(PlayerList.class, "phase$nameTaken"), "проверка ника при входе");
+		assertTrue(injected(PlayerList.class, "phase$nameTaken"), "name check on login");
 	}
 
-	/** Обработчик миксина попал в класс игры (Mixin добавляет к имени свой префикс). */
+	/** The mixin handler ended up in the game class (Mixin adds its own prefix to the name). */
 	private static boolean injected(Class<?> target, String handler) {
 		return Arrays.stream(target.getDeclaredMethods()).anyMatch(m -> m.getName().endsWith(handler));
 	}

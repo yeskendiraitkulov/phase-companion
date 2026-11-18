@@ -1,7 +1,7 @@
 plugins {
-	// Оба вида Loom из одного артефакта объявлены здесь, чтобы адаптеры загружали их
-	// одним загрузчиком классов. 26.x выходит без обфускации — Loom без переназначения
-	// имён; 1.21.1 и старше — обычный Loom с маппингами Mojang.
+	// Both Loom variants from one artifact are declared here so the adapters load them
+	// with a single class loader. 26.x ships unobfuscated, so it uses Loom without remapping;
+	// 1.21.1 and older use the regular Loom with Mojang mappings.
 	id 'net.fabricmc.fabric-loom' version "${loom_version}" apply false
 	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}" apply false
 }
